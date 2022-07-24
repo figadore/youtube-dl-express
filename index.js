@@ -114,7 +114,6 @@ async function download(queueItem) {
   const addMetadata = true
   console.log(`Downloading ${videoId} into ${filename}...`)
   await yas.downloader
-    .setFolder('some/folder') // Optionally set a folder for downloaded content.
     .onSuccess((result) => {
       console.log({result})
       const videoId = result.id
@@ -143,7 +142,6 @@ app.listen(port, () => {
 })
 
 function getIdFromUrl(urlOrId) {
-  return urlOrId
   if (urlOrId.length == 11) {
     console.log(`getIdFromUrl returning ${urlOrId} as is`)
     return urlOrId
