@@ -1,14 +1,18 @@
 <html>
   <head>
-    <script source="page.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="page.js"></script>
   </head>
   <form>
-    <label for="url">Video URL or ID</label>
-    <input id="url" type="text">
+    <label for="urlOrId">Video URL or ID</label>
+    <input id="urlOrId" type="text">
     <br />
     <label for="filename">Save as filename</label>
     <input id="filename" type="text">
     <br />
     <input type="submit" value="Submit">
   </form>
+  <div id="status"></div>
+  <button type="button" id="results-btn">Get results</button>
+  <div id="results"></div>
 </html>

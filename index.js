@@ -31,6 +31,7 @@ app.get('/queue', (req, res) => {
 })
 
 app.get('/results', (req, res) => {
+  console.log({failures})
   res.send({
     queue,
     successes,
@@ -111,12 +112,12 @@ async function download(queueItem) {
       console.error(`Sorry, an error ocurred when trying to download ${videoId}`, error)
       // Move queue item to error results
       failures.push(queueItem)
+      console.log({failures})
       removeFromQueue(queueItem)
       processDownloads()
     })
     .download({ id: videoId, file: filename, useCache, addMetadata }, (err, result) => {
       console.log("Download complete. Does this ever happen?")
-      //removeFromQueue(queueItem)
     })
 }
 
