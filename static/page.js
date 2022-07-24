@@ -5,6 +5,7 @@ $(function(){
   console.log("Here is the script")
   $("form").submit(function(e) {
     let urlOrId = $("#urlOrId").val()
+    let folder = $("#folder").val()
     let filename = $("#filename").val()
     $.ajax({
       url: "/queue",
