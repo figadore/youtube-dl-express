@@ -120,7 +120,7 @@ async function download(queueItem) {
   const addMetadata = true
   console.log(`Downloading ${videoId} into ${filename}...`)
   await yas.downloader
-    .setFolder(`youtube-dl/${folder}`) // mkdir if it doesn't exist
+    .setFolder(`/youtube-dl/${folder}`) // mkdir if it doesn't exist
     .onSuccess((result) => {
       console.log({result})
       const videoId = result.id
