@@ -31,7 +31,6 @@ app.get('/queue', (req, res) => {
 })
 
 app.get('/results', (req, res) => {
-  console.log({failures})
   res.send({
     queue,
     successes,
