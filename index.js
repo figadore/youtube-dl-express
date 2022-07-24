@@ -42,6 +42,7 @@ app.post('/queue', jsonParser, (req, res) => {
   console.log("got post request to /queue with body:", req.body);
   const queueItem = {
     urlOrId: req.body.urlOrId,
+    folder: req.body.folder,
     filename: req.body.filename,
   }
   console.log("adding to queue");
@@ -67,7 +68,7 @@ function removeFromQueue(queueItem) {
   let newQueue = []
   // Not the best way to do this for a couple reasons (effienciency, thraed safety)
   queue.forEach(iterItem => {
-    if (queueItem.urlOrId != iterItem.urlOrId || queueItem.filename != iterItem.filename) {
+    if (queueItem.urlOrId != iterItem.urlOrId || queueItem.folder != iterItem.folder ||  queueItem.filename != iterItem.filename) {
       newQueue.push(iterItem)
     }
   })
@@ -83,31 +84,37 @@ function processDownloads() {
   }
 }
 
-async function download(queueItem) {
-  const urlOrId = queueItem['urlOrId']
-  const inputFilename = queueItem['filename']
-  // Ensure the file name is valid
-  if (!/^[a-z0-9_ .-]+$/i.test(inputFilename)) {
-    console.error("Invalid file name, please try again")
+function handleError(msg) {
+    console.error(msg)
+    queueItem.error = msg
+    // Move queue item to error results
     failures.push(queueItem)
     console.log({failures})
     removeFromQueue(queueItem)
     processDownloads()
+}
+
+async function download(queueItem) {
+  const urlOrId = queueItem['urlOrId']
+  const folder = queueItem['folder']
+  const inputFilename = queueItem['filename']
+  // Ensure the folder name is valid (a-Z, 0-9, underscores, dashes and spaces
+  if (!/^[a-z0-9_ -]+$/i.test(folder)) {
+    handleError("Invalid directory name, please try again")
+  }
+  // Ensure the file name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
+  if (!/^[a-z0-9_ .-]+$/i.test(inputFilename)) {
+    handleError("Invalid file name, please try again")
   }
   let filename = inputFilename
   // Add mp3 extension if missing
   if (!/.*\.mp3$/.test(inputFilename)) {
     filename = `${inputFilename}.mp3`
   }
-  filename = `/youtube-dl/${filename}`
+  filename = `/youtube-dl/${folder}/${filename}`
   const videoId = getIdFromUrl(urlOrId)
   if (videoId == false) {
-    console.log("Regex failed, breaking now")
-    // Move queue item to error results
-    failures.push(queueItem)
-    console.log({failures})
-    removeFromQueue(queueItem)
-    processDownloads()
+    handleError("Regex failed, breaking now")
   }
   const useCache = false
   const addMetadata = true
@@ -124,12 +131,7 @@ async function download(queueItem) {
       processDownloads()
     })
     .onError(({ id, filename, error }) => {
-      console.error(`Sorry, an error ocurred when trying to download ${videoId}`, error)
-      // Move queue item to error results
-      failures.push(queueItem)
-      console.log({failures})
-      removeFromQueue(queueItem)
-      processDownloads()
+      handleError(`Sorry, an error ocurred when trying to download ${videoId}`, error)
     })
     .download({ id: videoId, file: filename, useCache, addMetadata }, (err, result) => {
       console.log("Download complete. Does this ever happen?")
