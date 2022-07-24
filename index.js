@@ -147,7 +147,7 @@ function getIdFromUrl(urlOrId) {
     return urlOrId
   }
   var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  var match = url.match(regExp);
+  var match = urlOrId.match(regExp);
   if (match && match[2].length == 11) {
     console.log(`getIdFromUrl returning ${match[2]} as is`)
     return match[2];
