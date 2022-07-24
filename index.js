@@ -100,7 +100,7 @@ async function download(queueItem) {
   const folder = queueItem['folder'].trim()
   const inputFilename = queueItem['filename'].trim()
   // Ensure the file name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
-  if (!/^[a-z0-9_ -]+$/i.test(folder)) {
+  if (!/^[a-z0-9_ .-]+$/i.test(folder)) {
     handleError("Invalid directory name, please try again", queueItem)
   }
   // Ensure the file name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
