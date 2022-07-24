@@ -86,12 +86,29 @@ function processDownloads() {
 
 async function download(queueItem) {
   const urlOrId = queueItem['urlOrId']
-  const filename = queueItem['filename']
+  const inputFilename = queueItem['filename']
+  // Ensure the file name is valid
+  if (!/^[a-z0-9_ .-]+$/i.test(inputFilename)) {
+    console.error("Invalid file name, please try again")
+    failures.push(queueItem)
+    console.log({failures})
+    removeFromQueue(queueItem)
+    processDownloads()
+  }
+  let filename = inputFilename
+  // Add mp3 extension if missing
+  if (!/.*\.mp3$/.test(inputFilename)) {
+    filename = `${inputFilename}.mp3`
+  }
+  filename = `/youtube-dl/${filename}`
   const videoId = getIdFromUrl(urlOrId)
   if (videoId == false) {
     console.log("Regex failed, breaking now")
     // Move queue item to error results
-    removeFromQueue()
+    failures.push(queueItem)
+    console.log({failures})
+    removeFromQueue(queueItem)
+    processDownloads()
   }
   const useCache = false
   const addMetadata = true
