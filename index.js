@@ -48,7 +48,8 @@ app.post('/queue', jsonParser, (req, res) => {
   console.log("adding to queue");
   addToQueue(queueItem)
   res.send({
-    success: true
+    success: true,
+    item: queueItem
   })
 })
 
@@ -68,7 +69,7 @@ function removeFromQueue(queueItem) {
   let newQueue = []
   // Not the best way to do this for a couple reasons (effienciency, thraed safety)
   queue.forEach(iterItem => {
-    if (queueItem.urlOrId != iterItem.urlOrId || queueItem.folder != iterItem.folder ||  queueItem.filename != iterItem.filename) {
+    if (queueItem.urlOrId != iterItem.urlOrId || queueItem.folder != iterItem.folder || queueItem.filename != iterItem.filename) {
       newQueue.push(iterItem)
     }
   })
@@ -84,27 +85,27 @@ function processDownloads() {
   }
 }
 
-function handleError(msg) {
-    console.error(msg)
-    queueItem.error = msg
-    // Move queue item to error results
-    failures.push(queueItem)
-    console.log({failures})
-    removeFromQueue(queueItem)
-    processDownloads()
+function handleError(msg, queueItem) {
+  console.error(msg)
+  queueItem.error = msg
+  // Move queue item to error results
+  failures.push(queueItem)
+  console.log({ failures })
+  removeFromQueue(queueItem)
+  processDownloads()
 }
 
 async function download(queueItem) {
-  const urlOrId = queueItem['urlOrId']
-  const folder = queueItem['folder']
-  const inputFilename = queueItem['filename']
-  // Ensure the folder name is valid (a-Z, 0-9, underscores, dashes and spaces
-  if (!/^[a-z0-9_ -]+$/i.test(folder)) {
-    handleError("Invalid directory name, please try again")
+  const urlOrId = queueItem['urlOrId'].trim()
+  const folder = queueItem['folder'].trim()
+  const inputFilename = queueItem['filename'].trim()
+  // Ensure the file name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
+  if (!/^[a-z0-9_ .-]+$/i.test(folder)) {
+    handleError("Invalid directory name, please try again", queueItem)
   }
   // Ensure the file name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
   if (!/^[a-z0-9_ .-]+$/i.test(inputFilename)) {
-    handleError("Invalid file name, please try again")
+    handleError("Invalid file name, please try again", queueItem)
   }
   let filename = inputFilename
   // Add mp3 extension if missing
@@ -114,7 +115,7 @@ async function download(queueItem) {
   filename = `/youtube-dl/${folder}/${filename}`
   const videoId = getIdFromUrl(urlOrId)
   if (videoId == false) {
-    handleError("Regex failed, breaking now")
+    handleError("Regex failed, breaking now", queueItem)
   }
   const useCache = false
   const addMetadata = true
@@ -122,7 +123,7 @@ async function download(queueItem) {
   await yas.downloader
     .setFolder(`/youtube-dl/${folder}`) // mkdir if it doesn't exist
     .onSuccess((result) => {
-      console.log({result})
+      console.log({ result })
       const videoId = result.id
       const filename = result.file
       console.log(`Yay! Audio (${videoId}) downloaded successfully into "${filename}"!`)
@@ -132,7 +133,7 @@ async function download(queueItem) {
       processDownloads()
     })
     .onError(({ id, filename, error }) => {
-      handleError(`Sorry, an error ocurred when trying to download ${videoId}`, error)
+      handleError(`Sorry, an error ocurred when trying to download ${videoId}: ${error}`, queueItem)
     })
     .download({ id: videoId, file: filename, useCache, addMetadata }, (err, result) => {
       console.log("Download complete. Does this ever happen?")
@@ -140,7 +141,7 @@ async function download(queueItem) {
 }
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+  console.log(`Example app listening on port ${port}`)
 })
 
 function getIdFromUrl(urlOrId) {

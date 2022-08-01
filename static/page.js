@@ -1,21 +1,21 @@
 
-$(function(){
+$(function () {
   results = $("#status");
 
   console.log("Here is the script")
-  $("form").submit(function(e) {
+  $("form").submit(function (e) {
     let urlOrId = $("#urlOrId").val()
     let folder = $("#folder").val()
     let filename = $("#filename").val()
     $.ajax({
       url: "/queue",
       type: "POST",
-      data: JSON.stringify({urlOrId, folder, filename}),
+      data: JSON.stringify({ urlOrId, folder, filename }),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: onEnqueue,
       failure: (err) => {
-        console.log({err});
+        console.log({ err });
         results.text("Something went wrong while attempting to add this item to the queue");
       }
     });
@@ -27,8 +27,8 @@ $(function(){
       url: "/results",
       type: "GET",
       dataType: "json",
-      success: (data) =>  {
-        console.log({data});
+      success: (data) => {
+        console.log({ data });
         results.text("")
         if (data.queue.length) {
           results.append(`Queue:<br />`)
@@ -43,21 +43,24 @@ $(function(){
           })
         }
         if (data.failures.length) {
-          results.append(`Queue:<br />`)
+          results.append(`Failures:<br />`)
           data.failures.forEach((val, i) => {
             results.append(`${val.urlOrId}: ${val.folder}/${val.filename} - ${val.error}<br />`)
           })
         }
       },
       failure: (err) => {
-        console.log({err});
+        console.log({ err });
         results.text("Something went wrong while attempting to get the results");
       }
     });
   })
 
   function onEnqueue(data) {
-    console.log("onEnqueue:", {data})
-    results.text("Success")
+    console.log("onEnqueue:", { data })
+    results.text(`Success: Added ${data.folder}/${data.filename} to the download queue`)
+    setInterval(() => {
+      results.text("")
+    }, 4000);
   }
 });
