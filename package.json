@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,6 +12,6 @@
   "dependencies": {
     "body-parser": "^1.20.0",
     "express": "^4.18.1",
-    "youtube-audio-server": "github:figadore/youtube-audio-server#patch-1"
+    "youtube-audio-server": "github:figadore/youtube-audio-server#patch-2"
   }
 }
