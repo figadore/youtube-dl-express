@@ -42,7 +42,8 @@ app.post('/queue', jsonParser, (req, res) => {
   console.log("got post request to /queue with body:", req.body);
   const queueItem = {
     urlOrId: req.body.urlOrId,
-    folder: req.body.folder,
+    author: req.body.author,
+    title: req.body.title,
     filename: req.body.filename,
   }
   console.log("adding to queue");
@@ -69,7 +70,7 @@ function removeFromQueue(queueItem) {
   let newQueue = []
   // Not the best way to do this for a couple reasons (effienciency, thraed safety)
   queue.forEach(iterItem => {
-    if (queueItem.urlOrId != iterItem.urlOrId || queueItem.folder != iterItem.folder || queueItem.filename != iterItem.filename) {
+    if (queueItem.urlOrId != iterItem.urlOrId || queueItem.author != iterItem.author || queueItem.title != iterItem.title || queueItem.filename != iterItem.filename) {
       newQueue.push(iterItem)
     }
   })
@@ -97,22 +98,26 @@ function handleError(msg, queueItem) {
 
 async function download(queueItem) {
   const urlOrId = queueItem['urlOrId'].trim()
-  const folder = queueItem['folder'].trim()
+  const author = queueItem['author'].trim()
+  const title = queueItem['title'].trim()
   const inputFilename = queueItem['filename'].trim()
-  // Ensure the file name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
-  if (!/^[a-z0-9_ .-]+$/i.test(folder)) {
-    handleError("Invalid directory name, please try again", queueItem)
+  // Ensure the dir name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
+  if (!/^[a-z0-9_ .-]+$/i.test(author)) {
+    handleError("Invalid directory name, please use only numbers, letters, underscores, dashes, periods and spaces and try again", queueItem)
+  }
+  if (!/^[a-z0-9_ .-]+$/i.test(title)) {
+    handleError("Invalid directory name, please use only numbers, letters, underscores, dashes, periods and spaces and try again", queueItem)
   }
   // Ensure the file name is valid (a-Z, 0-9, underscores, dashes, periods and spaces
   if (!/^[a-z0-9_ .-]+$/i.test(inputFilename)) {
-    handleError("Invalid file name, please try again", queueItem)
+    handleError("Invalid file name, please use only numbers, letters, underscores, dashes, periods and spaces and try again", queueItem)
   }
   let filename = inputFilename
   // Add mp3 extension if missing
   if (!/.*\.mp3$/.test(inputFilename)) {
     filename = `${inputFilename}.mp3`
   }
-  filename = `/youtube-dl/${folder}/${filename}`
+  filename = `/youtube-dl/${author}/${title}/${filename}`
   const videoId = getIdFromUrl(urlOrId)
   if (videoId == false) {
     handleError("Regex failed, breaking now", queueItem)
@@ -121,7 +126,7 @@ async function download(queueItem) {
   const addMetadata = true
   console.log(`Downloading ${videoId} into ${filename}...`)
   await yas.downloader
-    .setFolder(`/youtube-dl/${folder}`) // mkdir if it doesn't exist
+    .setFolder(`/youtube-dl/${author}/${title}`) // mkdir if it doesn't exist
     .onSuccess((result) => {
       console.log({ result })
       const videoId = result.id
