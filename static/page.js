@@ -8,6 +8,7 @@ $(function () {
     let title = $("#title").val()
     let filename = $("#filename").val()
     let mp3ext = filename.endsWith(".mp3") ? "" : ".mp3"
+    $("#suggestion").html(`Suggested filename: 1 - ${title} - ${author}${mp3ext}`)
     $("#preview").html(`Preview: ${author}/${title}/${filename}${mp3ext}`)
   })
   $("form").submit(function (e) {
@@ -67,7 +68,7 @@ $(function () {
 
   function onEnqueue(data) {
     console.log("onEnqueue:", { data })
-    results.text(`Success: Added ${data.item.author}/${data.item.title}/${data.item.filename} to the download queue`)
+    results.text(`Added ${data.item.author}/${data.item.title}/${data.item.filename} to the download queue`)
     setTimeout(() => {
       results.text("")
     }, 4000);
