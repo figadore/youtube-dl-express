@@ -97,6 +97,9 @@ function handleError(msg, queueItem) {
 }
 
 async function download(queueItem) {
+  if (!queueItem.hasOwnProperty("urlOrId")) {
+    console.log("Queue item missing critical property", queueItem)
+  }
   const urlOrId = queueItem['urlOrId'].trim()
   const author = queueItem['author'].trim()
   const title = queueItem['title'].trim()
