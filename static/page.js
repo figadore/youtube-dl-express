@@ -3,6 +3,13 @@ $(function () {
   results = $("#status");
 
   console.log("Here is the script")
+  $(".form-control").on("input", (x) => {
+    let author = $("#author").val()
+    let title = $("#title").val()
+    let filename = $("#filename").val()
+    let mp3ext = filename.endsWith(".mp3") ? "" : ".mp3"
+    $("#preview").html(`Preview: ${author}/${title}/${filename}${mp3ext}`)
+  })
   $("form").submit(function (e) {
     if (e.preventDefault) e.preventDefault();
     let urlOrId = $("#urlOrId").val()
