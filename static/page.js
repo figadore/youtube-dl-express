@@ -35,19 +35,19 @@ $(function () {
         if (data.queue.length) {
           results.append(`Queue:<br />`)
           data.queue.forEach((val, i) => {
-            results.append(`${val.urlOrId}: ${val.author}/${val.title}}/${val.filename}<br />`)
+            results.append(`${val.urlOrId}: ${val.author}/${val.title}/${val.filename}<br />`)
           })
         }
         if (data.successes.length) {
           results.append(`Successes:<br />`)
           data.successes.forEach((val, i) => {
-            results.append(`${val.urlOrId}: ${val.author}/${val.title}}/${val.filename}<br />`)
+            results.append(`${val.urlOrId}: ${val.author}/${val.title}/${val.filename}<br />`)
           })
         }
         if (data.failures.length) {
           results.append(`Failures:<br />`)
           data.failures.forEach((val, i) => {
-            results.append(`${val.urlOrId}: ${val.author}/${val.title}}/${val.filename} - ${val.error}<br />`)
+            results.append(`${val.urlOrId}: ${val.author}/${val.title}/${val.filename} - ${val.error}<br />`)
           })
         }
       },
@@ -60,8 +60,8 @@ $(function () {
 
   function onEnqueue(data) {
     console.log("onEnqueue:", { data })
-    results.text(`Success: Added ${data.author}/${data.title}}/${data.filename} to the download queue`)
-    setInterval(() => {
+    results.text(`Success: Added ${data.item.author}/${data.item.title}/${data.item.filename} to the download queue`)
+    setTimeout(() => {
       results.text("")
     }, 4000);
   }
