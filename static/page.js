@@ -3,13 +3,25 @@ $(function () {
   results = $("#status");
 
   console.log("Here is the script")
-  $(".form-control").on("input", (x) => {
+  $("#author,#title,#filename").on("input", (x) => {
     let author = $("#author").val()
     let title = $("#title").val()
     let filename = $("#filename").val()
     let mp3ext = filename.endsWith(".mp3") ? "" : ".mp3"
-    $("#suggestion").html(`Suggested filename: 1 - ${title} - ${author}${mp3ext}`)
+    let suggestion = `<code>01 - ${title} - ${author}${mp3ext}<code>`
+    $("#suggestion").html(`Suggested filename: ${suggestion}`)
     $("#preview").html(`Preview: ${author}/${title}/${filename}${mp3ext}`)
+    return true
+  })
+  $("#suggestion").click(() => {
+    console.log("Suggestion clicked")
+    let author = $("#author").val()
+    let title = $("#title").val()
+    let filename = $("#filename").val()
+    let mp3ext = filename.endsWith(".mp3") ? "" : ".mp3"
+    let suggestion = `01 - ${title} - ${author}${mp3ext}`
+    $("#filename").val(suggestion)
+    return true
   })
   $("form").submit(function (e) {
     if (e.preventDefault) e.preventDefault();
