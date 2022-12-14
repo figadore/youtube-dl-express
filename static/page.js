@@ -3,14 +3,23 @@ $(function () {
   results = $("#status");
 
   console.log("Here is the script")
+  $(".form-control").on("input", (x) => {
+    let author = $("#author").val()
+    let title = $("#title").val()
+    let filename = $("#filename").val()
+    let mp3ext = filename.endsWith(".mp3") ? "" : ".mp3"
+    $("#preview").html(`Preview: ${author}/${title}/${filename}${mp3ext}`)
+  })
   $("form").submit(function (e) {
+    if (e.preventDefault) e.preventDefault();
     let urlOrId = $("#urlOrId").val()
-    let folder = $("#folder").val()
+    let author = $("#author").val()
+    let title = $("#title").val()
     let filename = $("#filename").val()
     $.ajax({
       url: "/queue",
       type: "POST",
-      data: JSON.stringify({ urlOrId, folder, filename }),
+      data: JSON.stringify({ urlOrId, author, title, filename }),
       contentType: "application/json; charset=utf-8",
       dataType: "json",
       success: onEnqueue,
@@ -33,19 +42,19 @@ $(function () {
         if (data.queue.length) {
           results.append(`Queue:<br />`)
           data.queue.forEach((val, i) => {
-            results.append(`${val.urlOrId}: ${val.folder}/${val.filename}<br />`)
+            results.append(`${val.urlOrId}: ${val.author}/${val.title}/${val.filename}<br />`)
           })
         }
         if (data.successes.length) {
           results.append(`Successes:<br />`)
           data.successes.forEach((val, i) => {
-            results.append(`${val.urlOrId}: ${val.folder}/${val.filename}<br />`)
+            results.append(`${val.urlOrId}: ${val.author}/${val.title}/${val.filename}<br />`)
           })
         }
         if (data.failures.length) {
           results.append(`Failures:<br />`)
           data.failures.forEach((val, i) => {
-            results.append(`${val.urlOrId}: ${val.folder}/${val.filename} - ${val.error}<br />`)
+            results.append(`${val.urlOrId}: ${val.author}/${val.title}/${val.filename} - ${val.error}<br />`)
           })
         }
       },
@@ -58,8 +67,8 @@ $(function () {
 
   function onEnqueue(data) {
     console.log("onEnqueue:", { data })
-    results.text(`Success: Added ${data.folder}/${data.filename} to the download queue`)
-    setInterval(() => {
+    results.text(`Success: Added ${data.item.author}/${data.item.title}/${data.item.filename} to the download queue`)
+    setTimeout(() => {
       results.text("")
     }, 4000);
   }

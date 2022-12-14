@@ -1,0 +1,8 @@
+input:invalid {
+    background-color: lightpink;
+    color: black;
+}
+
+.form {
+  max-width: 400px
+}
